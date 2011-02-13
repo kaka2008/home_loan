@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+  .divclass{
+   background-color:#f5f5d5;
+   height:30px
+  }
+  .title{
+  	background-color:#d0f1f6;
+	font-family:"宋体";
+	font-size:30px
+  }
+</style>
+<title>房贷计算器</title>
+<script type="text/javascript">
+  function calculate(){
+     if(validate()){
+		var loanWay = document.getElementById("loanWay").value;	 		
+		if(loanWay == "0"){
+			rate_equal();		
+		}else{
+			money_equal();
+		}
+	 }
+  }
+  //等额本息
+  function rate_equal(){
+     var loanMoney = document.getElementById("loanMoney").value;
+	 var year = document.getElementById("year").value;
+	 var rate = document.getElementById("rate").value;
+	 loanMoney = loanMoney * 10000;
+	 var months = year * 12;
+	 var innerHTML = "";
+	 var month_rate = rate / 12;
+	 
+	 var sub_money = Math.pow((1+month_rate),months);
+		
+	 innerHTML += "每月还款："+Math.round(getMonthMoney1(rate,loanMoney,months)*100)/100;
+	 
+	 document.getElementById("result").style.display="block";
+	 document.getElementById("result").innerHTML = innerHTML;
+	 document.getElementById("result_benjin").style.display="none";
+  }
+  
+  //本息还款的月还款额(参数: 年利率/贷款总额/贷款总月份
+  function getMonthMoney1(lilv, total, month){
+    var lilv_month = lilv / 12;//月利率
+    return total * lilv_month * Math.pow(1 + lilv_month, month) / (Math.pow(1 + lilv_month, month) - 1);
+  }
+  
+  //等额本金
+  function money_equal(){
+     var loanMoney = document.getElementById("loanMoney").value;
+	 var year = document.getElementById("year").value;
+	 var rate = document.getElementById("rate").value;
+	 var months = year*12;
+	 loanMoney = loanMoney *10000;
+	 var lixi = loanMoney*year*rate;
+	 var allMoney = loanMoney + lixi;
+	 var first_month_money = allMoney/(year*12);
+	 var first_month_rate = loanMoney*(rate/12);
+	 var first_month_benjin = first_month_money - first_month_rate;
+	
+	 var innerHTML = "第1月还款： "+Math.round(first_month_money*100)/100;
+	 var surplusMoney = loanMoney - first_month_benjin; 
+	 for(var i=2;i<=months;i++){
+	     var sub_rate = surplusMoney*(rate/12);
+		 innerHTML += "\n第"+i+"月还款："+Math.round((first_month_benjin+sub_rate)*100)/100;
+		 surplusMoney = surplusMoney - first_month_benjin;
+	 }
+	 document.getElementById("result").style.display="none";
+	 document.getElementById("result_benjin").style.display="block";
+	 document.getElementById("benjin").innerHTML = innerHTML;	 
+  }
+  
+  function validate(){
+      var loanMoney = document.getElementById("loanMoney").value;
+	  if(loanMoney == null || loanMoney == ""){
+	       alert("贷款金额不能为空");
+		   document.getElementById("loanMoney").focus();
+		   return false;
+	  }
+	  var year = document.getElementById("year").value;
+	  if(year == null || year == ""){
+	       alert("贷款年限不能为空");
+		   document.getElementById("year").focus();
+		   return false;
+	  }
+	  var rate = document.getElementById("rate").value;
+	  if(rate == null || rate == ""){
+	       alert("贷款利率不能为空");
+		   document.getElementById("rate").focus();
+		   return false;
+	  }
+	  return true;
+  }
+  
+</script>
+</head>
+<body>
+  <div class="title">
+  	欢迎使用房贷计算器~
+  </div>
+  <div style="height:5px">&nbsp;</div>
+  <div class="divclass">
+    1、还贷方式: <select id="loanWay"><option value="0">等额本息</option><option value="1">等额本金</option></select>
+  </div>
+  <div class="divclass">
+    2、贷款金额(万元): <input type="text" name="loanMoney" id="loanMoney">
+  </div>
+  <div class="divclass">
+    3、贷款年限:<input type="text" name="year" id="year"/>
+  </div>
+  <div class="divclass">
+    4、贷款利率：<input type="text" name="rate" id="rate" value="0.0660"/>
+  </div>
+  <div class="divclass">
+    <input type="button" name="计算" value="计算" onClick="calculate()">
+  </div>
+  <br>
+  <div class="divclass" id="result" style="display:none;height:20px">
+     
+  </div>
+  <div class="divclass" id="result_benjin" style="display:none;height:100px" >
+     <textarea id="benjin" rows="5"></textarea>
+  </div>
+</body>
+</html>
